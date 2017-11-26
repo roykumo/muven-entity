@@ -1,0 +1,38 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="roy" id="muven-product.0.0.1">
+	    <createTable tableName="product_type">
+			<column name="id" type="VARCHAR(50)">
+				<constraints primaryKey="true" nullable="false"/>
+			</column>
+			<column name="code" type="VARCHAR(50)"/>
+			<column name="description" type="VARCHAR(255)"/>
+			<column name="expiration" type="INT(1)" />
+			<column name="active_flag" type="INT(1)"/>
+			<column name="created_by" type="VARCHAR(255)" />
+			<column name="created_date" type="datetime" />
+			<column name="modified_by" type="VARCHAR(255)"/>
+			<column name="modified_date" type="datetime"/>
+		</createTable>
+		
+		<createTable tableName="product">
+			<column name="id" type="VARCHAR(50)">
+				<constraints primaryKey="true" nullable="false"/>
+			</column>
+			<column name="barcode" type="VARCHAR(150)"/>
+			<column name="name" type="VARCHAR(150)"/>
+			<column name="type" type="VARCHAR(50)"/>
+			<column name="alert_red" type="INT(1)"/>
+			<column name="alert_yellow" type="INT(1)"/>
+			<column name="alert_green" type="INT(1)"/>
+			<column name="active_flag" type="INT(1)"/>
+			<column name="created_by" type="VARCHAR(255)" />
+			<column name="created_date" type="datetime" />
+			<column name="modified_by" type="VARCHAR(255)"/>
+			<column name="modified_date" type="datetime"/>
+		</createTable>		
+	</changeSet>
+</databaseChangeLog>
