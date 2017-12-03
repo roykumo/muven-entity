@@ -155,6 +155,11 @@ public class ProductDaoServiceImpl extends BaseImpl implements ProductDaoService
 		
 		return stocks;
 	}
-	
-	
+
+	@Override
+	public Product getByBarcode(String barcode) {
+		return repo.findByBarcodeAndActiveFlag(barcode, Constants.ActiveFlag.ACTIVE);
+	}
+
+
 }

@@ -33,18 +33,29 @@ public class NotificationDaoServiceImpl extends BaseImpl implements Notification
 		q.setParameter("typeId", type.getId());
 		
 		List<SaleNotification> saleNotifications = q.getResultList();
-		
-		try{
-			for (SaleNotification notif : saleNotifications) {
+
+		if(saleNotifications!=null && !saleNotifications.isEmpty()){
+			try {
+				for (int i = saleNotifications.size()-1; i >= 0; i--) {
+					SaleNotification notif = saleNotifications.get(i);
+					SellPrice sellPrice = sellPriceService.getLatestPriceByProduct(notif.getProduct());
+					if(sellPrice!=null && sellPrice.getSale()){
+						notif.setSellPrice(sellPrice);
+					}else{
+						saleNotifications.remove(i);
+					}
+				}
+			/*for (SaleNotification notif : saleNotifications) {
 				SellPrice sellPrice = sellPriceService.getLatestPriceByProduct(notif.getProduct());
 				if(sellPrice!=null && sellPrice.getSale()){
 					notif.setSellPrice(sellPrice);
 				}else{
 					saleNotifications.remove(notif);
 				}
+			}*/
+			} catch (Exception e) {
+				logger.error(e.getMessage());
 			}
-		}catch(Exception e){
-			logger.error(e.getMessage());
 		}
 		
 		return saleNotifications;

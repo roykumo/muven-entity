@@ -36,4 +36,45 @@
 			<column name="modified_date" type="datetime"/>
 		</createTable>	
 	</changeSet>
+
+	<changeSet author="roy" id="muven-inventory.0.0.2">
+		<addColumn tableName="inventory">
+			<column name="total_price" type="DECIMAL(18,3)" />
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="roy" id="muven-inventory-out.0.0.1">
+		<createTable tableName="inventory_out">
+			<column name="id" type="VARCHAR(50)">
+				<constraints primaryKey="true" nullable="false"/>
+			</column>
+			<column name="date" type="datetime"/>
+			<column name="total_price" type="DECIMAL(18,3)" />
+			<column name="type" type="VARCHAR(20)"/>
+			<column name="inventory_in" type="VARCHAR(50)"/>
+			<column name="active_flag" type="INT(1)"/>
+			<column name="created_by" type="VARCHAR(255)" />
+			<column name="created_date" type="datetime" />
+			<column name="modified_by" type="VARCHAR(255)"/>
+			<column name="modified_date" type="datetime"/>
+		</createTable>
+	</changeSet>
+
+	<changeSet author="roy" id="muven-inventory-item-out.0.0.1">
+		<createTable tableName="inventory_item_out">
+			<column name="id" type="VARCHAR(50)">
+				<constraints primaryKey="true" nullable="false"/>
+			</column>
+			<column name="product" type="VARCHAR(50)"/>
+			<column name="inventory_out" type="VARCHAR(50)"/>
+			<column name="quantity" type="INT(4)"/>
+			<column name="purchase_price" type="DECIMAL(18,3)"/>
+			<column name="sell_price" type="VARCHAR(50)"/>
+			<column name="active_flag" type="INT(1)"/>
+			<column name="created_by" type="VARCHAR(255)" />
+			<column name="created_date" type="datetime" />
+			<column name="modified_by" type="VARCHAR(255)"/>
+			<column name="modified_date" type="datetime"/>
+		</createTable>
+	</changeSet>
 </databaseChangeLog>

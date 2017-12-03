@@ -22,4 +22,6 @@ public interface ProductDaoService {
 	boolean delete(Product product);
 	
 	List<ProductStock> getProductStock(ProductType type);
+
+	Product getByBarcode(String barcode);
 }

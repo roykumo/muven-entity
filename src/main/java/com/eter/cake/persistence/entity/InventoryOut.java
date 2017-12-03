@@ -1,26 +1,20 @@
 package com.eter.cake.persistence.entity;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.hibernate.annotations.GenericGenerator;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-
-import org.hibernate.annotations.GenericGenerator;
-
-import com.fasterxml.jackson.annotation.JsonFilter;
-import com.fasterxml.jackson.annotation.JsonFormat;
-
-@Entity(name="InventoryEntity")
-@Table(name = "inventory")
-@JsonFilter(value="jsonFilterInventoryEntity")
-public class Inventory extends BaseEntity implements Serializable {
-	private static final long serialVersionUID = -1830613094428061226L;
+@Entity(name="InventoryOutEntity")
+@Table(name = "inventory_out")
+@JsonFilter(value="jsonFilterInventoryOutEntity")
+public class InventoryOut extends BaseEntity implements Serializable {
+	private static final long serialVersionUID = 1;
 
 	public abstract interface Constant{
 		public static final String ID_FIELD = "id";
@@ -28,20 +22,25 @@ public class Inventory extends BaseEntity implements Serializable {
 		public static final String DATE_FIELD = "date";
 		public static final String CREATED_DATE_FIELD = "createdDate";
 		public static final String MODIFIED_DATE_FIELD = "modifiedDate";
+		public static final String OUT_TYPE_REPACKING = "RP";
+		public static final String OUT_TYPE_STOCK_OPNAME = "SO";
 	}
 	
 	@Id
 	@GeneratedValue(generator = "system-uuid")
 	@GenericGenerator(name = "system-uuid", strategy = "uuid")
 	private String id;
-	private String transactionCode;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS", timezone="GMT+7")
 	private Date date;
-
 	private BigDecimal totalPrice;
+	private String type;
 
-	@OneToMany(mappedBy="inventory")
-    private List<InventoryItem> items;
+	@ManyToOne()
+	@JoinColumn(name = "inventory_in")
+	private Inventory inventoryIn;
+
+	@OneToMany(mappedBy="inventoryOut")
+    private List<InventoryItemOut> items;
 
 	public String getId() {
 		return id;
@@ -49,14 +48,6 @@ public class Inventory extends BaseEntity implements Serializable {
 
 	public void setId(String id) {
 		this.id = id;
-	}
-
-	public String getTransactionCode() {
-		return transactionCode;
-	}
-
-	public void setTransactionCode(String transactionCode) {
-		this.transactionCode = transactionCode;
 	}
 
 	public Date getDate() {
@@ -67,11 +58,11 @@ public class Inventory extends BaseEntity implements Serializable {
 		this.date = date;
 	}
 
-	public List<InventoryItem> getItems() {
+	public List<InventoryItemOut> getItems() {
 		return items;
 	}
 
-	public void setItems(List<InventoryItem> items) {
+	public void setItems(List<InventoryItemOut> items) {
 		this.items = items;
 	}
 
@@ -81,6 +72,22 @@ public class Inventory extends BaseEntity implements Serializable {
 
 	public void setTotalPrice(BigDecimal totalPrice) {
 		this.totalPrice = totalPrice;
+	}
+
+	public Inventory getInventoryIn() {
+		return inventoryIn;
+	}
+
+	public void setInventoryIn(Inventory inventoryIn) {
+		this.inventoryIn = inventoryIn;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 }
