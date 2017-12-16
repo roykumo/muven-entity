@@ -35,4 +35,16 @@
 			<column name="modified_date" type="datetime"/>
 		</createTable>		
 	</changeSet>
+
+	<changeSet author="roy" id="muven-product.0.0.2">
+		<addColumn tableName="product">
+			<column name="code" type="VARCHAR(30)" />
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="roy" id="muven-product.0.0.3">
+		<addColumn tableName="product">
+			<column name="alert_blue" type="INT(1)" />
+		</addColumn>
+	</changeSet>
 </databaseChangeLog>

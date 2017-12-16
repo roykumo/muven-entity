@@ -35,6 +35,7 @@ public class Product extends BaseEntity implements Serializable {
 	@GeneratedValue(generator = "system-uuid")
 	@GenericGenerator(name = "system-uuid", strategy = "uuid")
 	private String id;
+	private String code;
 	private String barcode;
 	private String name;
 
@@ -45,6 +46,7 @@ public class Product extends BaseEntity implements Serializable {
 	private Integer alertRed;
 	private Integer alertYellow;
 	private Integer alertGreen;
+	private Integer alertBlue;
 	
 	public String getId() {
 		return id;
@@ -88,4 +90,17 @@ public class Product extends BaseEntity implements Serializable {
 	public void setAlertGreen(Integer alertGreen) {
 		this.alertGreen = alertGreen;
 	}
+	public String getCode() {
+		return code;
+	}
+	public void setCode(String code) {
+		this.code = code;
+	}
+	public Integer getAlertBlue() {
+		return alertBlue;
+	}
+	public void setAlertBlue(Integer alertBlue) {
+		this.alertBlue = alertBlue;
+	}
+
 }
