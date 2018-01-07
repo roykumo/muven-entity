@@ -2,5 +2,12 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
 	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
-	<include file ="liquibase/db.product.insert.changelog-0.0.xml"/>
+	<changeSet author="roy" id="insert-product-gula-0.1" runOnChange="true">
+		<loadUpdateData encoding="UTF-8" file="liquibase/data/product/db.product-gula-0.1.csv"
+			primaryKey="id"
+			quotchar='"' separator=","
+			tableName="product">
+		</loadUpdateData>
+	</changeSet>	
+
 </databaseChangeLog>

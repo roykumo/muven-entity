@@ -8,4 +8,5 @@ public interface ProductRepository extends PagingAndSortingRepository<Product, S
 	Product findById(String id);
 	Product findByIdAndActiveFlag(String id, Integer activeFlag);
 	Product findByBarcodeAndActiveFlag(String barcode, Integer activeFlag);
+	Product findByCodeAndActiveFlag(String code, Integer activeFlag);
 }

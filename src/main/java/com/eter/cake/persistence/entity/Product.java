@@ -39,7 +39,21 @@ public class Product extends BaseEntity implements Serializable {
 	private String barcode;
 	private String name;
 
-    @ManyToOne()
+	public Product(){}
+
+	public Product(String id, String code, String barcode, String name, ProductType type, Integer alertRed, Integer alertYellow, Integer alertGreen, Integer alertBlue) {
+		this.id = id;
+		this.code = code;
+		this.barcode = barcode;
+		this.name = name;
+		this.type = type;
+		this.alertRed = alertRed;
+		this.alertYellow = alertYellow;
+		this.alertGreen = alertGreen;
+		this.alertBlue = alertBlue;
+	}
+
+	@ManyToOne()
     @JoinColumn(name = "type")    
 	private ProductType type;
     

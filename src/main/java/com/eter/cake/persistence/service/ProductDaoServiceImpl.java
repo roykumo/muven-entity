@@ -132,13 +132,15 @@ public class ProductDaoServiceImpl extends BaseImpl implements ProductDaoService
 		}
 	}
 	
-	private static final String SELECT_PRODUCT_STOCK_PER_TYPE = "select new com.eter.cake.persistence.entity.rest.ProductStock(it.product as product, sum(it.quantity) as quantity, sum(it.purchasePrice * it.quantity) as buyPrice, min(it.expiredDate) as expiredDate) from InventoryItemEntity it where it.product.type.id =:typeId   AND it.product.activeFlag = 1     GROUP BY it.product ";
-	
+	private static final String SELECT_PRODUCT_STOCK_PER_TYPE = "select new com.eter.cake.persistence.entity.rest.ProductStock(it.product as product, sum(it.quantity) as quantity, sum(it.purchasePrice * it.quantity) as buyPrice, min(it.expiredDate) as expiredDate) from InventoryItemEntity it where it.product.type.id =:typeId AND it.inventory.type =:type AND it.product.activeFlag = 1     GROUP BY it.product ";
+	private static final String SELECT_PRODUCT_STOCK_PER_TYPE_AND_BARCODE = "select new com.eter.cake.persistence.entity.rest.ProductStock(it.product as product, sum(it.quantity) as quantity, sum(it.purchasePrice * it.quantity) as buyPrice, min(it.expiredDate) as expiredDate) from InventoryItemEntity it where it.product.type.id =:typeId AND it.inventory.type =:type AND it.product.code like :barcode  AND it.product.activeFlag = 1     GROUP BY it.product ";
+
 	@Override
 	public List<ProductStock> getProductStock(ProductType type) {
 		TypedQuery<ProductStock> q = em.createQuery(SELECT_PRODUCT_STOCK_PER_TYPE, ProductStock.class);
 		q.setParameter("typeId", type.getId());
-		
+		q.setParameter("type", "PU");
+
 		List<ProductStock> stocks = q.getResultList();
 		
 		try{
@@ -180,9 +182,48 @@ public class ProductDaoServiceImpl extends BaseImpl implements ProductDaoService
 	}
 
 	@Override
+	public List<ProductStock> getProductStock(ProductType type, String barcode) {
+		TypedQuery<ProductStock> q = em.createQuery(SELECT_PRODUCT_STOCK_PER_TYPE_AND_BARCODE, ProductStock.class);
+		q.setParameter("typeId", type.getId());
+		q.setParameter("barcode", "%"+barcode+"%");
+        q.setParameter("type", "PU");
+
+		List<ProductStock> stocks = q.getResultList();
+
+		try{
+			for (ProductStock stock : stocks) {
+				stock.setSellPrice(sellPriceService.getLatestPriceByProduct(stock.getProduct()));
+				try {
+					KeyValue keyValue = new KeyValue();
+					keyValue.setKey("inventory.product");
+					keyValue.setValue(stock.getProduct().getId());
+
+					List<KeyValue> filter = new ArrayList<>();
+					filter.add(keyValue);
+
+					List<InventoryItemOut> listOut = inventoryItemOutDaoService.getListPaging(0, 1000, "1", "createdDate", filter);
+					if(listOut!=null && !listOut.isEmpty()){
+						int stockOut = listOut.stream().mapToInt(o-> o.getQuantity()).sum();
+						stock.setQuantity(stock.getQuantity() - stockOut);
+					}
+				}catch (Exception e){
+					logger.error(e.getMessage());
+				}
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage());
+		}
+
+		return stocks;
+	}
+
+	@Override
 	public Product getByBarcode(String barcode) {
 		return repo.findByBarcodeAndActiveFlag(barcode, Constants.ActiveFlag.ACTIVE);
 	}
 
-
+    @Override
+    public Product getByCode(String code) {
+        return repo.findByCodeAndActiveFlag(code, Constants.ActiveFlag.ACTIVE);
+    }
 }

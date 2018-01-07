@@ -77,4 +77,29 @@
 			<column name="modified_date" type="datetime"/>
 		</createTable>
 	</changeSet>
+
+	<changeSet author="roy" id="muven-inventory.0.0.3">
+		<addColumn tableName="inventory">
+			<column name="invoice" type="VARCHAR(50)" />
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="roy" id="muven-inventory.0.0.4">
+		<addColumn tableName="inventory">
+			<column name="supplier" type="VARCHAR(150)" />
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="roy" id="muven-inventory-item-out.0.0.2">
+		<addColumn tableName="inventory_item_out">
+			<column name="remarks" type="VARCHAR(200)" />
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="roy" id="muven-inventory.0.0.5">
+		<addColumn tableName="inventory">
+			<column name="type" type="VARCHAR(5)" />
+		</addColumn>
+	</changeSet>
+
 </databaseChangeLog>

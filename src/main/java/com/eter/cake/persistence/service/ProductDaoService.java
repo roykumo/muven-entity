@@ -23,5 +23,8 @@ public interface ProductDaoService {
 	
 	List<ProductStock> getProductStock(ProductType type);
 
+	List<ProductStock> getProductStock(ProductType type, String barcode);
+
 	Product getByBarcode(String barcode);
+	Product getByCode(String barcode);
 }
