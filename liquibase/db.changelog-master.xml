@@ -6,5 +6,6 @@
 	<include file="liquibase/db.product.changelog-0.0.xml" />
 	<include file="liquibase/db.inventory.changelog-0.0.xml" />
 	<include file="liquibase/db.sellprice.changelog-0.0.xml" />
+	<include file="liquibase/db.payment.changelog-0.0.xml" />
  	<include file="liquibase/db.changelog-insert-0.0.xml" />
 </databaseChangeLog>

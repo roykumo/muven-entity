@@ -1,6 +1,7 @@
 package com.eter.cake.persistence.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -62,7 +63,11 @@ public abstract class BaseImpl {
 		        			Product prod = new Product();
 			        		prod.setId(keyValue.getValue());
 			        		predicates.add(critB.equal(root.get("product"), prod));
-		        		}else if (isNumeric(keyValue.getValue())) {
+		        		}else if(keyValue.getKey().equalsIgnoreCase("date")){
+							Date date = new Date();
+							date.setTime(Long.parseLong(keyValue.getValue()));
+							predicates.add(critB.equal(root.get("date"), date));
+						}else if (isNumeric(keyValue.getValue())) {
 			                predicates.add(critB.equal(root.get(keyValue.getKey()), keyValue.getValue()));
 			            } else {
 			            	predicates.add(critB.like(root.get(keyValue.getKey()), "%" + keyValue.getValue() + "%"));

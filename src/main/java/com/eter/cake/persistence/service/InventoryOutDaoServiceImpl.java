@@ -86,19 +86,22 @@ public class InventoryOutDaoServiceImpl extends BaseImpl implements InventoryOut
 			tx.begin();
 
 			//inventory in
-			Inventory savedInventory = em.merge(inventoryOut.getInventoryIn());
-			if(inventoryOut.getInventoryIn().getItems()!=null && !inventoryOut.getInventoryIn().getItems().isEmpty()){
-				for (Iterator<InventoryItem> it = inventoryOut.getInventoryIn().getItems().iterator(); it.hasNext();) {
-					InventoryItem item = it.next();
-					item.setInventory(savedInventory);
+			if(inventoryOut.getInventoryIn()!=null){
+				Inventory savedInventory = em.merge(inventoryOut.getInventoryIn());
+				if(inventoryOut.getInventoryIn().getItems()!=null && !inventoryOut.getInventoryIn().getItems().isEmpty()){
+					for (Iterator<InventoryItem> it = inventoryOut.getInventoryIn().getItems().iterator(); it.hasNext();) {
+						InventoryItem item = it.next();
+						item.setInventory(savedInventory);
 
-					em.persist(item);
-					em.flush();
-					em.clear();
+						em.merge(item);
+						em.flush();
+						em.clear();
+					}
 				}
+				inventoryOut.setInventoryIn(em.merge(savedInventory));
 			}
+
 			//inventory out
-			inventoryOut.setInventoryIn(savedInventory);
 			saved = em.merge(inventoryOut);
 			if(inventoryOut.getItems()!=null && !inventoryOut.getItems().isEmpty()){
 				for (Iterator<InventoryItemOut> it = inventoryOut.getItems().iterator(); it.hasNext();) {
@@ -123,4 +126,6 @@ public class InventoryOutDaoServiceImpl extends BaseImpl implements InventoryOut
 		
 		return saved;
 	}
+
+
 }

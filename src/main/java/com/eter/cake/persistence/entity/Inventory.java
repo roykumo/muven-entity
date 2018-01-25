@@ -5,11 +5,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import com.eter.cake.Constants;
 import org.hibernate.annotations.GenericGenerator;
@@ -43,6 +39,10 @@ public class Inventory extends BaseEntity implements Serializable {
 	private Date date;
 
 	private BigDecimal totalPrice;
+
+	@ManyToOne()
+	@JoinColumn(name = "product_type")
+	private ProductType productType;
 
 	@OneToMany(mappedBy="inventory")
     private List<InventoryItem> items;
@@ -111,4 +111,11 @@ public class Inventory extends BaseEntity implements Serializable {
 		this.type = type;
 	}
 
+	public ProductType getProductType() {
+		return productType;
+	}
+
+	public void setProductType(ProductType productType) {
+		this.productType = productType;
+	}
 }

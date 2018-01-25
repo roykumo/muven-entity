@@ -32,6 +32,7 @@ public class InventoryItemOut extends BaseEntity implements Serializable {
     private Product product;
     private Integer quantity;
     private BigDecimal purchasePrice;
+	private BigDecimal sellPriceTrx;
 	private String remarks;
 
 	@ManyToOne
@@ -85,5 +86,10 @@ public class InventoryItemOut extends BaseEntity implements Serializable {
 	public void setRemarks(String remarks) {
 		this.remarks = remarks;
 	}
-
+	public BigDecimal getSellPriceTrx() {
+		return sellPriceTrx;
+	}
+	public void setSellPriceTrx(BigDecimal sellPriceTrx) {
+		this.sellPriceTrx = sellPriceTrx;
+	}
 }

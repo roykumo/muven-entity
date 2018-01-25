@@ -1,0 +1,26 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="roy" id="muven-payment.0.0.1">
+	    <createTable tableName="payment">
+			<column name="id" type="VARCHAR(50)">
+				<constraints primaryKey="true" nullable="false"/>
+			</column>
+			<column name="type" type="VARCHAR(20)"/>
+			<column name="card_type" type="VARCHAR(20)"/>
+			<column name="card_reff_no" type="VARCHAR(50)"/>
+			<column name="receipt_no" type="VARCHAR(50)"/>
+			<column name="pay_amount" type="DECIMAL(18,3)"/>
+			<column name="total_amount" type="DECIMAL(18,3)"/>
+			<column name="remarks" type="VARCHAR(50)"/>
+			<column name="active_flag" type="INT(1)"/>
+			<column name="created_by" type="VARCHAR(255)" />
+			<column name="created_date" type="datetime" />
+			<column name="modified_by" type="VARCHAR(255)"/>
+			<column name="modified_date" type="datetime"/>
+		</createTable>	
+	</changeSet>
+		
+</databaseChangeLog>

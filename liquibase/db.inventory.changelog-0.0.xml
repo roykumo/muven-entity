@@ -102,4 +102,41 @@
 		</addColumn>
 	</changeSet>
 
+	<changeSet author="roy" id="muven-inventory-out.0.0.2">
+		<addColumn tableName="inventory_out">
+			<column name="remarks" type="VARCHAR(255)" />
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="roy" id="muven-inventory-out.0.0.3">
+		<addColumn tableName="inventory_out">
+			<column name="transaction_code" type="VARCHAR(50)"/>
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="roy" id="muven-inventory-item-out.0.0.3">
+		<addColumn tableName="inventory_item_out">
+			<column name="sell_price_trx" type="DECIMAL(18,3)" />
+		</addColumn>
+	</changeSet>
+
+    <changeSet author="roy" id="muven-inventory-out.0.0.4">
+        <addColumn tableName="inventory_out">
+            <column name="payment" type="VARCHAR(50)"/>
+        </addColumn>
+    </changeSet>
+
+	<changeSet author="roy" id="muven-inventory.0.0.6">
+		<addColumn tableName="inventory">
+			<column name="product_type" type="VARCHAR(50)" />
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="roy" id="muven-inventory-out.0.0.5">
+		<addColumn tableName="inventory_out">
+			<column name="product_type" type="VARCHAR(50)"/>
+		</addColumn>
+	</changeSet>
+
+
 </databaseChangeLog>

@@ -63,8 +63,10 @@ public class Constants {
 
 	public final class InventoryType{
 		public static final String PURCHASE = "PU";
-		public static final String STOCK_OPNAME = "SO";
-		public static final String REPACKING = "RP";
-		public static final String DAMAGE = "DM";
+		public static final String STOCK_OPNAME = "ST";
+		public static final String REPACKING = "RE";
+		public static final String CASH_REGISTER = "CR";
+		public static final String ONLINE = "SA";
+		public static final String DAMAGE = "EX";
 	}
 }
