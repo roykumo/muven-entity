@@ -27,6 +27,7 @@ public class ProductCategory extends BaseEntity implements Serializable {
 	private String id;
 	private String code;
 	private String description;
+	private int orderNo = 0;
 
 	@ManyToOne
 	@JoinColumn(name="parent")
@@ -66,5 +67,10 @@ public class ProductCategory extends BaseEntity implements Serializable {
 	public void setType(ProductType type) {
 		this.type = type;
 	}
-
+	public int getOrderNo() {
+		return orderNo;
+	}
+	public void setOrderNo(int orderNo) {
+		this.orderNo = orderNo;
+	}
 }

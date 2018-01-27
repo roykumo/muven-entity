@@ -64,4 +64,11 @@
 			<column name="modified_date" type="datetime"/>
 		</createTable>
 	</changeSet>
+
+	<changeSet author="roy" id="muven-product.0.0.5">
+		<addColumn tableName="product_category">
+			<column name="order_no" type="INT(1)" />
+		</addColumn>
+	</changeSet>
+
 </databaseChangeLog>

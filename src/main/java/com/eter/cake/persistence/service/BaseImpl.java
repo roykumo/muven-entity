@@ -12,6 +12,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import com.eter.cake.persistence.entity.ProductCategory;
 import org.springframework.util.StringUtils;
 
 import com.eter.cake.Constants;
@@ -67,6 +68,14 @@ public abstract class BaseImpl {
 							Date date = new Date();
 							date.setTime(Long.parseLong(keyValue.getValue()));
 							predicates.add(critB.equal(root.get("date"), date));
+						}else if(keyValue.getKey().equalsIgnoreCase("categoryParent")){
+							if(StringUtils.isEmpty(keyValue.getValue()) || keyValue.getValue().equalsIgnoreCase("null")){
+								predicates.add(critB.isNull(root.get("parent")));
+							}else{
+								ProductCategory parent = new ProductCategory();
+								parent.setId(keyValue.getValue());
+								predicates.add(critB.equal(root.get("parent"), parent));
+							}
 						}else if (isNumeric(keyValue.getValue())) {
 			                predicates.add(critB.equal(root.get(keyValue.getKey()), keyValue.getValue()));
 			            } else {
