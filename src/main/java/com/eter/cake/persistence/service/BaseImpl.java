@@ -55,8 +55,16 @@ public abstract class BaseImpl {
 		        		if(keyValue.getKey().equalsIgnoreCase("productType")){
 		        			ProductType type = new ProductType();
 			        		type.setId(keyValue.getValue());
-			        		predicates.add(critB.equal(root.get("type"), type));
-		        		}else if(keyValue.getKey().equalsIgnoreCase("inventory.product")){
+			        		predicates.add(critB.equal(root.get("category").get("type"), type));
+		        		}else if(keyValue.getKey().equalsIgnoreCase("productBarcode")){
+							Predicate orCode = critB.like(root.get("code"), keyValue.getValue());
+							Predicate orBarcode = critB.like(root.get("barcode"), keyValue.getValue());
+							predicates.add(critB.or(orCode, orBarcode));
+						}else if(keyValue.getKey().equalsIgnoreCase("categoryProductType")){
+							ProductType type = new ProductType();
+							type.setId(keyValue.getValue());
+							predicates.add(critB.equal(root.get("type"), type));
+						}else if(keyValue.getKey().equalsIgnoreCase("inventory.product")){
 		        			Product prod = new Product();
 			        		prod.setId(keyValue.getValue());
 			        		predicates.add(critB.equal(root.get("product"), prod));

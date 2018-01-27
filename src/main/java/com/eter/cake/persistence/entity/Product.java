@@ -39,23 +39,27 @@ public class Product extends BaseEntity implements Serializable {
 	private String barcode;
 	private String name;
 
+	@ManyToOne
+	@JoinColumn(name="category")
+	private ProductCategory category;
+
 	public Product(){}
 
-	public Product(String id, String code, String barcode, String name, ProductType type, Integer alertRed, Integer alertYellow, Integer alertGreen, Integer alertBlue) {
+	public Product(String id, String code, String barcode, String name, ProductCategory category, Integer alertRed, Integer alertYellow, Integer alertGreen, Integer alertBlue) {
 		this.id = id;
 		this.code = code;
 		this.barcode = barcode;
 		this.name = name;
-		this.type = type;
+		this.category = category;
 		this.alertRed = alertRed;
 		this.alertYellow = alertYellow;
 		this.alertGreen = alertGreen;
 		this.alertBlue = alertBlue;
 	}
 
-	@ManyToOne()
+	/*@ManyToOne()
     @JoinColumn(name = "type")    
-	private ProductType type;
+	private ProductType type;*/
     
 	private Integer alertRed;
 	private Integer alertYellow;
@@ -79,12 +83,6 @@ public class Product extends BaseEntity implements Serializable {
 	}
 	public void setName(String name) {
 		this.name = name;
-	}
-	public ProductType getType() {
-		return type;
-	}
-	public void setType(ProductType type) {
-		this.type = type;
 	}
 	public Integer getAlertRed() {
 		return alertRed;
@@ -116,5 +114,10 @@ public class Product extends BaseEntity implements Serializable {
 	public void setAlertBlue(Integer alertBlue) {
 		this.alertBlue = alertBlue;
 	}
-
+	public ProductCategory getCategory() {
+		return category;
+	}
+	public void setCategory(ProductCategory category) {
+		this.category = category;
+	}
 }
