@@ -21,6 +21,7 @@ public class Transaction {
     private Date date;
     private String type;
     private BigDecimal totalPrice;
+    private String productType;
 
     public Transaction(){}
 
@@ -30,6 +31,15 @@ public class Transaction {
         this.date = date;
         this.type = type;
         this.totalPrice = totalPrice;
+    }
+
+    public Transaction(String id, String transactionCode, Date date, String type, BigDecimal totalPrice, String productType) {
+        this.id = id;
+        this.transactionCode = transactionCode;
+        this.date = date;
+        this.type = type;
+        this.totalPrice = totalPrice;
+        this.productType = productType;
     }
 
     public String getId() {
@@ -70,5 +80,13 @@ public class Transaction {
 
     public void setTotalPrice(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public String getProductType() {
+        return productType;
+    }
+
+    public void setProductType(String productType) {
+        this.productType = productType;
     }
 }

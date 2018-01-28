@@ -14,6 +14,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -87,32 +88,42 @@ public class InventoryOutDaoServiceImpl extends BaseImpl implements InventoryOut
 
 			//inventory in
 			if(inventoryOut.getInventoryIn()!=null){
+                List<InventoryItem> listItem = inventoryOut.getInventoryIn().getItems();
 				Inventory savedInventory = em.merge(inventoryOut.getInventoryIn());
-				if(inventoryOut.getInventoryIn().getItems()!=null && !inventoryOut.getInventoryIn().getItems().isEmpty()){
-					for (Iterator<InventoryItem> it = inventoryOut.getInventoryIn().getItems().iterator(); it.hasNext();) {
-						InventoryItem item = it.next();
+				if(listItem!=null && !listItem.isEmpty()){
+				    List<InventoryItem> listSavedItem = new ArrayList<>();
+					for (InventoryItem item: listItem) {
 						item.setInventory(savedInventory);
 
-						em.merge(item);
-						em.flush();
-						em.clear();
+						InventoryItem i = em.merge(item);
+						//em.flush();
+						//em.clear();
+
+						listSavedItem.add(i);
 					}
+					savedInventory.setItems(listSavedItem);
 				}
 				inventoryOut.setInventoryIn(em.merge(savedInventory));
 			}
 
 			//inventory out
+            List<InventoryItemOut> listItemOut = inventoryOut.getItems();
 			saved = em.merge(inventoryOut);
-			if(inventoryOut.getItems()!=null && !inventoryOut.getItems().isEmpty()){
-				for (Iterator<InventoryItemOut> it = inventoryOut.getItems().iterator(); it.hasNext();) {
-					InventoryItemOut item = it.next();
-					item.setInventoryOut(saved);
+			if(listItemOut!=null && !listItemOut.isEmpty()){
+			    List<InventoryItemOut>  listSavedItemOut = new ArrayList<>();
+				for (InventoryItemOut io : listItemOut) {
+					io.setInventoryOut(saved);
 	
-		            em.persist(item);
-		            em.flush();
-		            em.clear();
+		            listSavedItemOut.add(em.merge(io));
+		            //em.flush();
+		            //em.clear();
 		        }
+		        saved.setItems(listSavedItemOut);
+                saved = em.merge(saved);
 			}
+
+			em.flush();
+			em.clear();
 
 			tx.commit();
 			

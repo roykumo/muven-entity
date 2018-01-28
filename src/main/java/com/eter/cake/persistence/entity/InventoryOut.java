@@ -40,7 +40,7 @@ public class InventoryOut extends BaseEntity implements Serializable {
 	private String remarks;
     private String transactionCode;
 
-	@ManyToOne()
+	@ManyToOne(cascade = {CascadeType.ALL})
 	@JoinColumn(name = "inventory_in")
 	private Inventory inventoryIn;
 

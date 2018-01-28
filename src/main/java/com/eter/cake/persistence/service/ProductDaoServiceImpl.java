@@ -132,14 +132,16 @@ public class ProductDaoServiceImpl extends BaseImpl implements ProductDaoService
 		}
 	}
 	
-	private static final String SELECT_PRODUCT_STOCK_PER_TYPE = "select new com.eter.cake.persistence.entity.rest.ProductStock(it.product as product, sum(it.quantity) as quantity, sum(it.purchasePrice * it.quantity) as buyPrice, min(it.expiredDate) as expiredDate) from InventoryItemEntity it where it.product.category.type.id =:typeId AND it.inventory.type =:type AND it.product.activeFlag = 1     GROUP BY it.product ";
-	private static final String SELECT_PRODUCT_STOCK_PER_TYPE_AND_BARCODE = "select new com.eter.cake.persistence.entity.rest.ProductStock(it.product as product, sum(it.quantity) as quantity, sum(it.purchasePrice * it.quantity) as buyPrice, min(it.expiredDate) as expiredDate) from InventoryItemEntity it where it.product.category.type.id =:typeId AND it.inventory.type =:type AND it.product.code like :barcode  AND it.product.activeFlag = 1     GROUP BY it.product ";
+	private static final String SELECT_PRODUCT_STOCK_PER_TYPE = "select new com.eter.cake.persistence.entity.rest.ProductStock(it.product as product, sum(it.quantity) as quantity, sum(it.purchasePrice * it.quantity) as buyPrice, min(it.expiredDate) as expiredDate) from InventoryItemEntity it where it.product.category.type.id =:typeId AND it.product.activeFlag = 1     GROUP BY it.product ";
+	//private static final String SELECT_PRODUCT_STOCK_PER_TYPE_FILTER_BY_PU = "select new com.eter.cake.persistence.entity.rest.ProductStock(it.product as product, sum(it.quantity) as quantity, sum(it.purchasePrice * it.quantity) as buyPrice, min(it.expiredDate) as expiredDate) from InventoryItemEntity it where it.product.category.type.id =:typeId AND it.inventory.type =:type AND it.product.activeFlag = 1     GROUP BY it.product ";
+	private static final String SELECT_PRODUCT_STOCK_PER_TYPE_AND_BARCODE = "select new com.eter.cake.persistence.entity.rest.ProductStock(it.product as product, sum(it.quantity) as quantity, sum(it.purchasePrice * it.quantity) as buyPrice, min(it.expiredDate) as expiredDate) from InventoryItemEntity it where it.product.category.type.id =:typeId AND (it.product.code like :barcode OR it.product.barcode like :barcode )  AND it.product.activeFlag = 1     GROUP BY it.product ";
+	//private static final String SELECT_PRODUCT_STOCK_PER_TYPE_AND_BARCODE_FILTER_BY_PU = "select new com.eter.cake.persistence.entity.rest.ProductStock(it.product as product, sum(it.quantity) as quantity, sum(it.purchasePrice * it.quantity) as buyPrice, min(it.expiredDate) as expiredDate) from InventoryItemEntity it where it.product.category.type.id =:typeId AND it.inventory.type =:type AND (it.product.code like :barcode OR it.product.barcode like :barcode )  AND it.product.activeFlag = 1     GROUP BY it.product ";
 
 	@Override
 	public List<ProductStock> getProductStock(ProductType type) {
 		TypedQuery<ProductStock> q = em.createQuery(SELECT_PRODUCT_STOCK_PER_TYPE, ProductStock.class);
 		q.setParameter("typeId", type.getId());
-		q.setParameter("type", "PU");
+		//q.setParameter("type", "PU");
 
 		List<ProductStock> stocks = q.getResultList();
 		
@@ -186,7 +188,7 @@ public class ProductDaoServiceImpl extends BaseImpl implements ProductDaoService
 		TypedQuery<ProductStock> q = em.createQuery(SELECT_PRODUCT_STOCK_PER_TYPE_AND_BARCODE, ProductStock.class);
 		q.setParameter("typeId", type.getId());
 		q.setParameter("barcode", "%"+barcode+"%");
-        q.setParameter("type", "PU");
+        //q.setParameter("type", "PU");
 
 		List<ProductStock> stocks = q.getResultList();
 
