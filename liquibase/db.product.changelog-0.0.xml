@@ -77,4 +77,10 @@
 		</addColumn>
 	</changeSet>
 
+	<changeSet author="roy" id="muven-product.0.0.7">
+		<addColumn tableName="product">
+			<column name="product_group" type="VARCHAR(4)" />
+		</addColumn>
+	</changeSet>
+
 </databaseChangeLog>

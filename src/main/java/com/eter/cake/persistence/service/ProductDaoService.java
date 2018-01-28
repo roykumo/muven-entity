@@ -3,6 +3,7 @@ package com.eter.cake.persistence.service;
 import java.util.List;
 
 import com.eter.cake.persistence.entity.Product;
+import com.eter.cake.persistence.entity.ProductCategory;
 import com.eter.cake.persistence.entity.ProductType;
 import com.eter.cake.persistence.entity.rest.KeyValue;
 import com.eter.cake.persistence.entity.rest.ProductStock;
@@ -24,6 +25,15 @@ public interface ProductDaoService {
 	List<ProductStock> getProductStock(ProductType type);
 
 	List<ProductStock> getProductStock(ProductType type, String barcode);
+
+	//List<ProductStock> getProductStock(ProductType type, String barcode, String category);
+
+	List<ProductStock> getProductStockByGroup(ProductType type, String group);
+	List<ProductStock> getProductStock(ProductType type, ProductCategory category);
+	List<ProductStock> getProductStockByCategoryAndGroup(ProductType type, ProductCategory category, String group);
+	List<ProductStock> getProductStockByBarcodeAndGroup(ProductType type, String barcode, String group);
+	List<ProductStock> getProductStockByCategoryAndBarcode(ProductType type, ProductCategory category, String barcode);
+	List<ProductStock> getProductStock(ProductType type, ProductCategory category, String barcode, String group);
 
 	Product getByBarcode(String barcode);
 	Product getByCode(String barcode);

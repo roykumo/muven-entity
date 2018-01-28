@@ -11,32 +11,30 @@ import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import com.eter.cake.persistence.entity.InventoryItemOut;
-import com.eter.cake.persistence.entity.InventoryOut;
+import com.eter.cake.persistence.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eter.cake.Constants;
-import com.eter.cake.persistence.entity.Product;
-import com.eter.cake.persistence.entity.ProductType;
 import com.eter.cake.persistence.entity.rest.KeyValue;
 import com.eter.cake.persistence.entity.rest.ProductStock;
 import com.eter.cake.persistence.repo.ProductRepository;
 import com.eter.response.entity.CommonPaging;
+import org.springframework.util.StringUtils;
 
 public class ProductDaoServiceImpl extends BaseImpl implements ProductDaoService {
     private Logger logger = LoggerFactory.getLogger(ProductDaoServiceImpl.class);
 
 	@Autowired
 	protected ProductRepository repo;
-	
+
 	@Autowired
 	protected SellPriceDaoService sellPriceService;
 
 	@Autowired
 	protected InventoryItemOutDaoService inventoryItemOutDaoService;
-	
+
 	@Override
 	public CommonPaging<Product> getPaging(int pageSize, int page, String sortDir, String sort, List<KeyValue> filter) {
 		CommonPaging<Product> paging = new CommonPaging<Product>();
@@ -46,7 +44,7 @@ public class ProductDaoServiceImpl extends BaseImpl implements ProductDaoService
 		paging.setData(getListPaging(paging.getStartRow(), pageSize, sortDir, sort, filter));
 		return paging;
 	}
-	
+
 	@Override
 	public List<Product> getListPaging(int startRow, int rowPerPage, String sortDir, String sort, List<KeyValue> filter) {
 		CriteriaBuilder critB = em.getCriteriaBuilder();
@@ -56,17 +54,17 @@ public class ProductDaoServiceImpl extends BaseImpl implements ProductDaoService
 		Order o = sortDir.equals(Constants.ORDER_ASC) ? critB.asc(root.get(sort)) : critB.desc(root.get(sort));
 
 		List<Predicate> predicates = createSingleSearchPredicate(root, filter);
-		
+
 		query.select(root).where(
 				critB.and(predicates.toArray(new Predicate[predicates.size()]))
         ).orderBy(o);
-		
+
 		TypedQuery<Product> q = em.createQuery(query);
 		q.setFirstResult(startRow);
 		q.setMaxResults(rowPerPage);
 
 		return q.getResultList();
-		
+
 	}
 
 	@Override
@@ -75,9 +73,9 @@ public class ProductDaoServiceImpl extends BaseImpl implements ProductDaoService
 
 		CriteriaQuery<Long> query = critB.createQuery(Long.class);
 		Root<Product> root = query.from(Product.class);
-		
+
 		List<Predicate> predicates = createSingleSearchPredicate(root, filter);
-		
+
 		query.select(critB.count(root)).where(
 				critB.and(predicates.toArray(new Predicate[predicates.size()]))
         );
@@ -109,7 +107,7 @@ public class ProductDaoServiceImpl extends BaseImpl implements ProductDaoService
 		
 		return predicates;
     }*/
-	
+
 	@Override
 	public Product getById(String id) {
 		return repo.findByIdAndActiveFlag(id, Constants.ActiveFlag.ACTIVE);
@@ -131,11 +129,17 @@ public class ProductDaoServiceImpl extends BaseImpl implements ProductDaoService
 			return false;
 		}
 	}
-	
+
 	private static final String SELECT_PRODUCT_STOCK_PER_TYPE = "select new com.eter.cake.persistence.entity.rest.ProductStock(it.product as product, sum(it.quantity) as quantity, sum(it.purchasePrice * it.quantity) as buyPrice, min(it.expiredDate) as expiredDate) from InventoryItemEntity it where it.product.category.type.id =:typeId AND it.product.activeFlag = 1     GROUP BY it.product ";
 	//private static final String SELECT_PRODUCT_STOCK_PER_TYPE_FILTER_BY_PU = "select new com.eter.cake.persistence.entity.rest.ProductStock(it.product as product, sum(it.quantity) as quantity, sum(it.purchasePrice * it.quantity) as buyPrice, min(it.expiredDate) as expiredDate) from InventoryItemEntity it where it.product.category.type.id =:typeId AND it.inventory.type =:type AND it.product.activeFlag = 1     GROUP BY it.product ";
 	private static final String SELECT_PRODUCT_STOCK_PER_TYPE_AND_BARCODE = "select new com.eter.cake.persistence.entity.rest.ProductStock(it.product as product, sum(it.quantity) as quantity, sum(it.purchasePrice * it.quantity) as buyPrice, min(it.expiredDate) as expiredDate) from InventoryItemEntity it where it.product.category.type.id =:typeId AND (it.product.code like :barcode OR it.product.barcode like :barcode )  AND it.product.activeFlag = 1     GROUP BY it.product ";
 	//private static final String SELECT_PRODUCT_STOCK_PER_TYPE_AND_BARCODE_FILTER_BY_PU = "select new com.eter.cake.persistence.entity.rest.ProductStock(it.product as product, sum(it.quantity) as quantity, sum(it.purchasePrice * it.quantity) as buyPrice, min(it.expiredDate) as expiredDate) from InventoryItemEntity it where it.product.category.type.id =:typeId AND it.inventory.type =:type AND (it.product.code like :barcode OR it.product.barcode like :barcode )  AND it.product.activeFlag = 1     GROUP BY it.product ";
+	private static final String SELECT_PRODUCT_STOCK_PER_TYPE_AND_CATEGORY = "select new com.eter.cake.persistence.entity.rest.ProductStock(it.product as product, sum(it.quantity) as quantity, sum(it.purchasePrice * it.quantity) as buyPrice, min(it.expiredDate) as expiredDate) from InventoryItemEntity it where it.product.category.type.id =:typeId AND it.product.activeFlag = 1  AND (it.product.category.id =:category or it.product.category.parent.id =:category)   GROUP BY it.product ";
+	private static final String SELECT_PRODUCT_STOCK_PER_TYPE_AND_BARCODE_AND_CATEGORY = "select new com.eter.cake.persistence.entity.rest.ProductStock(it.product as product, sum(it.quantity) as quantity, sum(it.purchasePrice * it.quantity) as buyPrice, min(it.expiredDate) as expiredDate) from InventoryItemEntity it where it.product.category.type.id =:typeId AND (it.product.code like :barcode OR it.product.barcode like :barcode )  AND it.product.activeFlag = 1  AND (it.product.category.id =:category or it.product.category.parent.id =:category)   GROUP BY it.product ";
+	private static final String SELECT_PRODUCT_STOCK_PER_TYPE_AND_GROUP = "select new com.eter.cake.persistence.entity.rest.ProductStock(it.product as product, sum(it.quantity) as quantity, sum(it.purchasePrice * it.quantity) as buyPrice, min(it.expiredDate) as expiredDate) from InventoryItemEntity it where it.product.category.type.id =:typeId AND it.product.activeFlag = 1  AND it.product.productGroup =:group  GROUP BY it.product ";
+	private static final String SELECT_PRODUCT_STOCK_PER_TYPE_AND_BARCODE_AND_GROUP = "select new com.eter.cake.persistence.entity.rest.ProductStock(it.product as product, sum(it.quantity) as quantity, sum(it.purchasePrice * it.quantity) as buyPrice, min(it.expiredDate) as expiredDate) from InventoryItemEntity it where it.product.category.type.id =:typeId AND (it.product.code like :barcode OR it.product.barcode like :barcode )  AND it.product.activeFlag = 1  AND it.product.productGroup =:group  GROUP BY it.product ";
+	private static final String SELECT_PRODUCT_STOCK_PER_TYPE_AND_CATEGORY_AND_GROUP = "select new com.eter.cake.persistence.entity.rest.ProductStock(it.product as product, sum(it.quantity) as quantity, sum(it.purchasePrice * it.quantity) as buyPrice, min(it.expiredDate) as expiredDate) from InventoryItemEntity it where it.product.category.type.id =:typeId AND it.product.activeFlag = 1  AND (it.product.category.id =:category or it.product.category.parent.id =:category) AND it.product.productGroup =:group  GROUP BY it.product ";
+	private static final String SELECT_PRODUCT_STOCK_PER_TYPE_AND_BARCODE_AND_CATEGORY_AND_GROUP = "select new com.eter.cake.persistence.entity.rest.ProductStock(it.product as product, sum(it.quantity) as quantity, sum(it.purchasePrice * it.quantity) as buyPrice, min(it.expiredDate) as expiredDate) from InventoryItemEntity it where it.product.category.type.id =:typeId AND (it.product.code like :barcode OR it.product.barcode like :barcode )  AND it.product.activeFlag = 1  AND (it.product.category.id =:category or it.product.category.parent.id =:category) AND it.product.productGroup =:group  GROUP BY it.product ";
 
 	@Override
 	public List<ProductStock> getProductStock(ProductType type) {
@@ -144,7 +148,7 @@ public class ProductDaoServiceImpl extends BaseImpl implements ProductDaoService
 		//q.setParameter("type", "PU");
 
 		List<ProductStock> stocks = q.getResultList();
-		
+
 		try{
 			for (ProductStock stock : stocks) {
 				stock.setSellPrice(sellPriceService.getLatestPriceByProduct(stock.getProduct()));
@@ -179,7 +183,7 @@ public class ProductDaoServiceImpl extends BaseImpl implements ProductDaoService
 		}catch(Exception e){
 			logger.error(e.getMessage());
 		}
-		
+
 		return stocks;
 	}
 
@@ -217,6 +221,252 @@ public class ProductDaoServiceImpl extends BaseImpl implements ProductDaoService
 		}
 
 		return stocks;
+	}
+
+	@Override
+	public List<ProductStock> getProductStockByGroup(ProductType type, String group) {
+		TypedQuery<ProductStock> q = em.createQuery(SELECT_PRODUCT_STOCK_PER_TYPE_AND_GROUP, ProductStock.class);
+		q.setParameter("typeId", type.getId());
+		q.setParameter("group", group);
+		//q.setParameter("type", "PU");
+
+		List<ProductStock> stocks = q.getResultList();
+
+		try{
+			for (ProductStock stock : stocks) {
+				stock.setSellPrice(sellPriceService.getLatestPriceByProduct(stock.getProduct()));
+				try {
+					KeyValue keyValue = new KeyValue();
+					keyValue.setKey("inventory.product");
+					keyValue.setValue(stock.getProduct().getId());
+
+					List<KeyValue> filter = new ArrayList<>();
+					filter.add(keyValue);
+
+					List<InventoryItemOut> listOut = inventoryItemOutDaoService.getListPaging(0, 1000, "1", "createdDate", filter);
+					if(listOut!=null && !listOut.isEmpty()){
+						int stockOut = listOut.stream().mapToInt(o-> o.getQuantity()).sum();
+						stock.setQuantity(stock.getQuantity() - stockOut);
+					}
+				}catch (Exception e){
+					logger.error(e.getMessage());
+				}
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage());
+		}
+
+		return stocks;
+	}
+
+	@Override
+	public List<ProductStock> getProductStock(ProductType type, ProductCategory category) {
+
+		TypedQuery<ProductStock> q = em.createQuery(SELECT_PRODUCT_STOCK_PER_TYPE_AND_CATEGORY, ProductStock.class);
+		q.setParameter("typeId", type.getId());
+		q.setParameter("category", category.getId());
+		//q.setParameter("type", "PU");
+
+		List<ProductStock> stocks = q.getResultList();
+
+		try {
+			for (ProductStock stock : stocks) {
+				stock.setSellPrice(sellPriceService.getLatestPriceByProduct(stock.getProduct()));
+				try {
+					KeyValue keyValue = new KeyValue();
+					keyValue.setKey("inventory.product");
+					keyValue.setValue(stock.getProduct().getId());
+
+					List<KeyValue> filter = new ArrayList<>();
+					filter.add(keyValue);
+
+					List<InventoryItemOut> listOut = inventoryItemOutDaoService.getListPaging(0, 1000, "1", "createdDate", filter);
+					if (listOut != null && !listOut.isEmpty()) {
+						int stockOut = listOut.stream().mapToInt(o -> o.getQuantity()).sum();
+						stock.setQuantity(stock.getQuantity() - stockOut);
+					}
+				} catch (Exception e) {
+					logger.error(e.getMessage());
+				}
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+
+		return stocks;
+
+	}
+
+	@Override
+	public List<ProductStock> getProductStockByCategoryAndGroup(ProductType type, ProductCategory category, String group) {
+
+		TypedQuery<ProductStock> q = em.createQuery(SELECT_PRODUCT_STOCK_PER_TYPE_AND_CATEGORY_AND_GROUP, ProductStock.class);
+		q.setParameter("typeId", type.getId());
+		q.setParameter("category", category.getId());
+		q.setParameter("group", group);
+		//q.setParameter("type", "PU");
+
+		List<ProductStock> stocks = q.getResultList();
+
+		try {
+			for (ProductStock stock : stocks) {
+				stock.setSellPrice(sellPriceService.getLatestPriceByProduct(stock.getProduct()));
+				try {
+					KeyValue keyValue = new KeyValue();
+					keyValue.setKey("inventory.product");
+					keyValue.setValue(stock.getProduct().getId());
+
+					List<KeyValue> filter = new ArrayList<>();
+					filter.add(keyValue);
+
+					List<InventoryItemOut> listOut = inventoryItemOutDaoService.getListPaging(0, 1000, "1", "createdDate", filter);
+					if (listOut != null && !listOut.isEmpty()) {
+						int stockOut = listOut.stream().mapToInt(o -> o.getQuantity()).sum();
+						stock.setQuantity(stock.getQuantity() - stockOut);
+					}
+				} catch (Exception e) {
+					logger.error(e.getMessage());
+				}
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+
+		return stocks;
+
+	}
+
+	@Override
+	public List<ProductStock> getProductStockByBarcodeAndGroup(ProductType type, String barcode, String group) {
+
+		TypedQuery<ProductStock> q = em.createQuery(SELECT_PRODUCT_STOCK_PER_TYPE_AND_BARCODE_AND_GROUP, ProductStock.class);
+		q.setParameter("typeId", type.getId());
+		q.setParameter("barcode", "%"+barcode+"%");
+		q.setParameter("group", group);
+		//q.setParameter("type", "PU");
+
+		List<ProductStock> stocks = q.getResultList();
+
+		try {
+			for (ProductStock stock : stocks) {
+				stock.setSellPrice(sellPriceService.getLatestPriceByProduct(stock.getProduct()));
+				try {
+					KeyValue keyValue = new KeyValue();
+					keyValue.setKey("inventory.product");
+					keyValue.setValue(stock.getProduct().getId());
+
+					List<KeyValue> filter = new ArrayList<>();
+					filter.add(keyValue);
+
+					List<InventoryItemOut> listOut = inventoryItemOutDaoService.getListPaging(0, 1000, "1", "createdDate", filter);
+					if (listOut != null && !listOut.isEmpty()) {
+						int stockOut = listOut.stream().mapToInt(o -> o.getQuantity()).sum();
+						stock.setQuantity(stock.getQuantity() - stockOut);
+					}
+				} catch (Exception e) {
+					logger.error(e.getMessage());
+				}
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+
+		return stocks;
+
+	}
+
+	@Override
+	public List<ProductStock> getProductStockByCategoryAndBarcode(ProductType type, ProductCategory category, String barcode) {
+
+		TypedQuery<ProductStock> q = em.createQuery(SELECT_PRODUCT_STOCK_PER_TYPE_AND_BARCODE_AND_CATEGORY, ProductStock.class);
+		q.setParameter("typeId", type.getId());
+		q.setParameter("category", category.getId());
+		q.setParameter("barcode", "%"+barcode+"%");
+		//q.setParameter("type", "PU");
+
+		List<ProductStock> stocks = q.getResultList();
+
+		try {
+			for (ProductStock stock : stocks) {
+				stock.setSellPrice(sellPriceService.getLatestPriceByProduct(stock.getProduct()));
+				try {
+					KeyValue keyValue = new KeyValue();
+					keyValue.setKey("inventory.product");
+					keyValue.setValue(stock.getProduct().getId());
+
+					List<KeyValue> filter = new ArrayList<>();
+					filter.add(keyValue);
+
+					List<InventoryItemOut> listOut = inventoryItemOutDaoService.getListPaging(0, 1000, "1", "createdDate", filter);
+					if (listOut != null && !listOut.isEmpty()) {
+						int stockOut = listOut.stream().mapToInt(o -> o.getQuantity()).sum();
+						stock.setQuantity(stock.getQuantity() - stockOut);
+					}
+				} catch (Exception e) {
+					logger.error(e.getMessage());
+				}
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+
+		return stocks;
+
+	}
+
+	@Override
+	public List<ProductStock> getProductStock(ProductType type, ProductCategory category, String barcode, String group) {
+		if(StringUtils.isEmpty(barcode) && (category==null || StringUtils.isEmpty(category.getId())) && StringUtils.isEmpty(group)){
+			return getProductStock(type);
+		}else if((category==null || StringUtils.isEmpty(category.getId())) && StringUtils.isEmpty(group)){
+			return getProductStock(type, barcode);
+		}else if(StringUtils.isEmpty(barcode) && StringUtils.isEmpty(group)) {
+			return getProductStock(type, category);
+		}else if(StringUtils.isEmpty(barcode) && (category==null || StringUtils.isEmpty(category.getId()))) {
+			return getProductStockByGroup(type, group);
+		}else if(StringUtils.isEmpty(barcode)) {
+			return getProductStockByCategoryAndGroup(type, category, group);
+		}else if(category==null || StringUtils.isEmpty(category.getId())) {
+			return getProductStockByBarcodeAndGroup(type, barcode, group);
+		}else if(StringUtils.isEmpty(group)) {
+			return getProductStockByCategoryAndBarcode(type, category, barcode);
+		}
+		else{
+			TypedQuery<ProductStock> q = em.createQuery(SELECT_PRODUCT_STOCK_PER_TYPE_AND_BARCODE_AND_CATEGORY_AND_GROUP, ProductStock.class);
+			q.setParameter("typeId", type.getId());
+			q.setParameter("barcode", "%" + barcode + "%");
+			q.setParameter("category", category.getId());
+			q.setParameter("group", group);
+			//q.setParameter("type", "PU");
+
+			List<ProductStock> stocks = q.getResultList();
+
+			try {
+				for (ProductStock stock : stocks) {
+					stock.setSellPrice(sellPriceService.getLatestPriceByProduct(stock.getProduct()));
+					try {
+						KeyValue keyValue = new KeyValue();
+						keyValue.setKey("inventory.product");
+						keyValue.setValue(stock.getProduct().getId());
+
+						List<KeyValue> filter = new ArrayList<>();
+						filter.add(keyValue);
+
+						List<InventoryItemOut> listOut = inventoryItemOutDaoService.getListPaging(0, 1000, "1", "createdDate", filter);
+						if (listOut != null && !listOut.isEmpty()) {
+							int stockOut = listOut.stream().mapToInt(o -> o.getQuantity()).sum();
+							stock.setQuantity(stock.getQuantity() - stockOut);
+						}
+					} catch (Exception e) {
+						logger.error(e.getMessage());
+					}
+				}
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+			}
+
+			return stocks;
+		}
 	}
 
 	@Override

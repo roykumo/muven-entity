@@ -2,12 +2,7 @@ package com.eter.cake.persistence.entity;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -38,6 +33,7 @@ public class Product extends BaseEntity implements Serializable {
 	private String code;
 	private String barcode;
 	private String name;
+	private String productGroup;
 
 	@ManyToOne
 	@JoinColumn(name="category")
@@ -57,7 +53,19 @@ public class Product extends BaseEntity implements Serializable {
 		this.alertBlue = alertBlue;
 	}
 
-	/*@ManyToOne()
+	public Product(String id, String code, String barcode, String name, String productGroup, ProductCategory category, Integer alertRed, Integer alertYellow, Integer alertGreen, Integer alertBlue) {
+		this.id = id;
+		this.code = code;
+		this.barcode = barcode;
+		this.name = name;
+		this.productGroup = productGroup;
+		this.category = category;
+		this.alertRed = alertRed;
+		this.alertYellow = alertYellow;
+		this.alertGreen = alertGreen;
+		this.alertBlue = alertBlue;
+	}
+/*@ManyToOne()
     @JoinColumn(name = "type")    
 	private ProductType type;*/
     
@@ -119,5 +127,11 @@ public class Product extends BaseEntity implements Serializable {
 	}
 	public void setCategory(ProductCategory category) {
 		this.category = category;
+	}
+	public String getProductGroup() {
+		return productGroup;
+	}
+	public void setProductGroup(String productGroup) {
+		this.productGroup = productGroup;
 	}
 }
