@@ -1,6 +1,7 @@
 package com.eter.cake.persistence.service;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -9,6 +10,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceUnit;
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
@@ -73,9 +75,23 @@ public abstract class BaseImpl {
 			        		prod.setId(keyValue.getValue());
 			        		predicates.add(critB.equal(root.get("product"), prod));
 		        		}else if(keyValue.getKey().equalsIgnoreCase("date")){
-							Date date = new Date();
+							/*Date date = new Date();
 							date.setTime(Long.parseLong(keyValue.getValue()));
-							predicates.add(critB.equal(root.get("date"), date));
+							predicates.add(critB.equal(root.get("date"), date));*/
+							Date startDate = new Date();
+							startDate.setTime(Long.parseLong(keyValue.getValue()));
+							startDate.setHours(0);
+							startDate.setMinutes(0);
+							startDate.setSeconds(0);
+
+							Calendar endCal = Calendar.getInstance();
+							endCal.setTime(startDate);
+							endCal.add(Calendar.DAY_OF_MONTH, 1);
+
+							Path<Date> dateEntryPath = root.get("date");
+
+							predicates.add(critB.between(dateEntryPath, startDate, endCal.getTime()));
+
 						}else if(keyValue.getKey().equalsIgnoreCase("categoryParent")){
 							if(StringUtils.isEmpty(keyValue.getValue()) || keyValue.getValue().equalsIgnoreCase("null")){
 								predicates.add(critB.isNull(root.get("parent")));
