@@ -21,6 +21,7 @@ import com.eter.cake.persistence.entity.rest.KeyValue;
 import com.eter.cake.persistence.entity.rest.SaleNotification;
 import com.eter.cake.persistence.repo.SellPriceRepository;
 import com.eter.response.entity.CommonPaging;
+import org.springframework.util.StringUtils;
 
 public class NotificationDaoServiceImpl extends BaseImpl implements NotificationDaoService {
 
@@ -72,6 +73,9 @@ public class NotificationDaoServiceImpl extends BaseImpl implements Notification
 
 	//private static final String SELECT_STATUS_AND_STOCK_PER_PRODUCT = "select new com.eter.cake.persistence.entity.rest.StatusNotification(p.id as 'product.id', p.name as 'product.name', p.code as 'product.code', p.barcode as 'product.barcode', sp.id as 'sellPrice.id', sp.date as 'sellPrice.date', sp.buy_price as 'sellPrice.buy_price', sp.selling_price as 'sellPrice.selling_price', sp.sale as 'sellPrice.sale', sum(case when datediff(now(), it.expired_date) <= p.alert_red then it.quantity else 0 end) as quantity_red,  sum(case when datediff(now(), it.expired_date) > p.alert_red and datediff(now(), it.expired_date) <= p.alert_yellow then it.quantity else 0 end) as quantity_yellow,  sum(case when datediff(now(), it.expired_date) > p.alert_yellow and datediff(now(), it.expired_date) <= p.alert_green then it.quantity else 0 end) as quantity_green,  sum(case when datediff(now(), it.expired_date) > p.alert_green and datediff(now(), it.expired_date) <= p.alert_blue then it.quantity else 0 end) as quantity_blue,  coalesce(ito.quantity_out, 0) as quantity_out, sum(it.purchase_price * it.quantity) as buy_price,  min(it.expired_date) as expired_date) from inventory_item it inner join inventory i on it.inventory = i.id  inner join product p on it.product = p.id inner join product_type pt on p.type = pt.id left join sell_price sp on sp.product = p.id left join ( select po.id as po_id, sum(itout.quantity) as quantity_out from inventory_out iout  left join inventory_item_out itout on itout.inventory_out = iout.id inner join product po on itout.product = po.id group by po.id ) ito on p.id = ito.po_id where p.active_flag = 1 and i.type=:type and p.type =:productType group by p.id;";
 	private static final String SELECT_STATUS_AND_STOCK_PER_PRODUCT = "select  new com.eter.cake.persistence.entity.rest.StatusNotification( p.id as id,  p as product,  sum( case when datediff(now(), it.expiredDate) <= p.alertRed then it.quantity else 0 end ) as quantity_red,  sum( case when datediff(now(), it.expiredDate) > p.alertRed  and datediff(now(), it.expiredDate) <= p.alertYellow then it.quantity else 0 end ) as quantity_yellow,  sum( case when datediff(now(), it.expiredDate) > p.alertYellow  and datediff(now(), it.expiredDate) <= p.alertGreen then it.quantity else 0 end ) as quantity_green,  sum( case when datediff(now(), it.expiredDate) > p.alertGreen  and datediff(now(), it.expiredDate) <= p.alertBlue then it.quantity else 0 end ) as quantity_blue,  coalesce( ( select sum(itout.quantity) as quantity_out from InventoryItemOutEntity itout where itout.product.id = p.id group by itout.product.id\t\t\t ), 0) as quantity_out,  sum(it.purchasePrice * it.quantity) as buy_price , min(it.expiredDate) as expired_date)  from  InventoryItemEntity it  inner join it.inventory i inner join it.product p inner join p.category.type pt  where  p.activeFlag = 1 AND (p.code like :barcode OR p.barcode like :barcode )  and p.category.type.id =:productType  group by p.id";
+	private static final String SELECT_STATUS_AND_STOCK_PER_PRODUCT_AND_CATEGORY = "select  new com.eter.cake.persistence.entity.rest.StatusNotification( p.id as id,  p as product,  sum( case when datediff(now(), it.expiredDate) <= p.alertRed then it.quantity else 0 end ) as quantity_red,  sum( case when datediff(now(), it.expiredDate) > p.alertRed  and datediff(now(), it.expiredDate) <= p.alertYellow then it.quantity else 0 end ) as quantity_yellow,  sum( case when datediff(now(), it.expiredDate) > p.alertYellow  and datediff(now(), it.expiredDate) <= p.alertGreen then it.quantity else 0 end ) as quantity_green,  sum( case when datediff(now(), it.expiredDate) > p.alertGreen  and datediff(now(), it.expiredDate) <= p.alertBlue then it.quantity else 0 end ) as quantity_blue,  coalesce( ( select sum(itout.quantity) as quantity_out from InventoryItemOutEntity itout where itout.product.id = p.id group by itout.product.id\t\t\t ), 0) as quantity_out,  sum(it.purchasePrice * it.quantity) as buy_price , min(it.expiredDate) as expired_date)  from  InventoryItemEntity it  inner join it.inventory i inner join it.product p inner join p.category.type pt  where  p.activeFlag = 1 AND (p.code like :barcode OR p.barcode like :barcode )  and p.category.type.id =:productType AND p.category.id =:category group by p.id";
+	private static final String SELECT_STATUS_AND_STOCK_PER_PRODUCT_AND_GROUP = "select  new com.eter.cake.persistence.entity.rest.StatusNotification( p.id as id,  p as product,  sum( case when datediff(now(), it.expiredDate) <= p.alertRed then it.quantity else 0 end ) as quantity_red,  sum( case when datediff(now(), it.expiredDate) > p.alertRed  and datediff(now(), it.expiredDate) <= p.alertYellow then it.quantity else 0 end ) as quantity_yellow,  sum( case when datediff(now(), it.expiredDate) > p.alertYellow  and datediff(now(), it.expiredDate) <= p.alertGreen then it.quantity else 0 end ) as quantity_green,  sum( case when datediff(now(), it.expiredDate) > p.alertGreen  and datediff(now(), it.expiredDate) <= p.alertBlue then it.quantity else 0 end ) as quantity_blue,  coalesce( ( select sum(itout.quantity) as quantity_out from InventoryItemOutEntity itout where itout.product.id = p.id group by itout.product.id\t\t\t ), 0) as quantity_out,  sum(it.purchasePrice * it.quantity) as buy_price , min(it.expiredDate) as expired_date)  from  InventoryItemEntity it  inner join it.inventory i inner join it.product p inner join p.category.type pt  where  p.activeFlag = 1 AND (p.code like :barcode OR p.barcode like :barcode )  and p.category.type.id =:productType AND p.productGroup =:group group by p.id";
+	private static final String SELECT_STATUS_AND_STOCK_PER_PRODUCT_AND_CATEGORY_AND_GROUP = "select  new com.eter.cake.persistence.entity.rest.StatusNotification( p.id as id,  p as product,  sum( case when datediff(now(), it.expiredDate) <= p.alertRed then it.quantity else 0 end ) as quantity_red,  sum( case when datediff(now(), it.expiredDate) > p.alertRed  and datediff(now(), it.expiredDate) <= p.alertYellow then it.quantity else 0 end ) as quantity_yellow,  sum( case when datediff(now(), it.expiredDate) > p.alertYellow  and datediff(now(), it.expiredDate) <= p.alertGreen then it.quantity else 0 end ) as quantity_green,  sum( case when datediff(now(), it.expiredDate) > p.alertGreen  and datediff(now(), it.expiredDate) <= p.alertBlue then it.quantity else 0 end ) as quantity_blue,  coalesce( ( select sum(itout.quantity) as quantity_out from InventoryItemOutEntity itout where itout.product.id = p.id group by itout.product.id\t\t\t ), 0) as quantity_out,  sum(it.purchasePrice * it.quantity) as buy_price , min(it.expiredDate) as expired_date)  from  InventoryItemEntity it  inner join it.inventory i inner join it.product p inner join p.category.type pt  where  p.activeFlag = 1 AND (p.code like :barcode OR p.barcode like :barcode )  and p.category.type.id =:productType AND p.category.id =:category AND p.productGroup =:group group by p.id";
 	//private static final String SELECT_STATUS_AND_STOCK_PER_PRODUCT_FILTER_BY_PU = "select  new com.eter.cake.persistence.entity.rest.StatusNotification( p.id as id,  p as product,  sum( case when datediff(now(), it.expiredDate) <= p.alertRed then it.quantity else 0 end ) as quantity_red,  sum( case when datediff(now(), it.expiredDate) > p.alertRed  and datediff(now(), it.expiredDate) <= p.alertYellow then it.quantity else 0 end ) as quantity_yellow,  sum( case when datediff(now(), it.expiredDate) > p.alertYellow  and datediff(now(), it.expiredDate) <= p.alertGreen then it.quantity else 0 end ) as quantity_green,  sum( case when datediff(now(), it.expiredDate) > p.alertGreen  and datediff(now(), it.expiredDate) <= p.alertBlue then it.quantity else 0 end ) as quantity_blue,  coalesce( ( select sum(itout.quantity) as quantity_out from InventoryItemOutEntity itout where itout.product.id = p.id group by itout.product.id\t\t\t ), 0) as quantity_out,  sum(it.purchasePrice * it.quantity) as buy_price , min(it.expiredDate) as expired_date)  from  InventoryItemEntity it  inner join it.inventory i inner join it.product p inner join p.category.type pt  where  p.activeFlag = 1 AND (p.code like :barcode OR p.barcode like :barcode ) and i.type =:type  and p.category.type.id =:productType  group by p.id";
     @Override
     public List<StatusNotification> getStatusNotification(ProductType type, String barcode) {
@@ -108,6 +112,42 @@ public class NotificationDaoServiceImpl extends BaseImpl implements Notification
 
         return stocks;
     }
+
+	@Override
+	public List<StatusNotification> getStatusNotification(ProductType type, String category, String barcode, String group) {
+    	String sqlQuery = "";
+    	if(StringUtils.isEmpty(category) && StringUtils.isEmpty(group)){
+    		sqlQuery = SELECT_STATUS_AND_STOCK_PER_PRODUCT;
+		}else if(StringUtils.isEmpty(category)){
+    		sqlQuery= SELECT_STATUS_AND_STOCK_PER_PRODUCT_AND_GROUP;
+		}else if(StringUtils.isEmpty(group)){
+			sqlQuery= SELECT_STATUS_AND_STOCK_PER_PRODUCT_AND_CATEGORY;
+		}else{
+			sqlQuery= SELECT_STATUS_AND_STOCK_PER_PRODUCT_AND_CATEGORY_AND_GROUP;
+		}
+
+		TypedQuery<StatusNotification> q = em.createQuery(sqlQuery, StatusNotification.class);
+		//q.setParameter("type", "PU");
+		q.setParameter("productType", type.getId());
+		q.setParameter("barcode", "%"+barcode+"%");
+		if(!StringUtils.isEmpty(category))
+			q.setParameter("category", category);
+
+		if(!StringUtils.isEmpty(group))
+			q.setParameter("group", group);
+
+		List<StatusNotification> stocks = q.getResultList();
+
+		try{
+			for (StatusNotification stock : stocks) {
+				stock.setSellPrice(sellPriceService.getLatestPriceByProduct(stock.getProduct()));
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage());
+		}
+
+		return stocks;
+	}
 
 	@Override
 	public <T> T getById(String id) {
