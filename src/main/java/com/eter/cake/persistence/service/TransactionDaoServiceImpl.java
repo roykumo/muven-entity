@@ -1,6 +1,9 @@
 package com.eter.cake.persistence.service;
 
+import com.eter.cake.persistence.entity.ProductType;
 import com.eter.cake.persistence.entity.rest.KeyValue;
+import com.eter.cake.persistence.entity.rest.SellingReport;
+import com.eter.cake.persistence.entity.rest.StatusNotification;
 import com.eter.cake.persistence.entity.rest.Transaction;
 import com.eter.response.entity.CommonPaging;
 
@@ -31,4 +34,17 @@ public class TransactionDaoServiceImpl extends BaseImpl implements TransactionDa
 		return paging;
 	}
 
+	private static final String SELECT_SELLING_REPORT_BY_PRODUCT_TYPE = "SELECT new com.eter.cake.persistence.entity.rest.SellingReport (ito.id, ito.product, count(1), (sum(ito.quantity * ito.sellPriceTrx))) FROM InventoryItemOutEntity ito WHERE ito.product.category.type.id =:type AND MONTH(ito.inventoryOut.date) =:month AND YEAR(ito.inventoryOut.date) =:year AND ito.inventoryOut.type in ('CR','SA') GROUP BY ito.product.id ORDER BY ito.product.category.orderNo ASC";
+
+	@Override
+	public List<SellingReport> getSellingReport(ProductType type, int month, int year){
+		TypedQuery<SellingReport> q = em.createQuery(SELECT_SELLING_REPORT_BY_PRODUCT_TYPE, SellingReport.class);
+		q.setParameter("type", type.getId());
+		q.setParameter("month", month);
+		q.setParameter("year", year);
+
+		List<SellingReport> listSellingReport = q.getResultList();
+
+		return listSellingReport;
+	}
 }

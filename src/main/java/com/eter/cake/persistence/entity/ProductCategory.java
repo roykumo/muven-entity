@@ -73,4 +73,9 @@ public class ProductCategory extends BaseEntity implements Serializable {
 	public void setOrderNo(int orderNo) {
 		this.orderNo = orderNo;
 	}
+
+	@Transient
+	public String getCategoryTree(){
+		return (getParent()==null ? getType().getDescription() : getParent().getCategoryTree()) + " > " + getCode();
+	}
 }
