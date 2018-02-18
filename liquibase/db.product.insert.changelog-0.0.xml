@@ -8,6 +8,29 @@
 			quotchar='"' separator=","
 			tableName="product">
 		</loadUpdateData>
-	</changeSet>	
+	</changeSet>
 
+	<changeSet author="roy" id="insert-product-butter-0.1" runOnChange="true">
+		<loadUpdateData encoding="UTF-8" file="liquibase/data/product/db.product-butter-0.1.csv"
+						primaryKey="id"
+						quotchar='"' separator=","
+						tableName="product">
+		</loadUpdateData>
+	</changeSet>
+
+	<changeSet author="roy" id="insert-product-margarine-0.1" runOnChange="true">
+		<loadUpdateData encoding="UTF-8" file="liquibase/data/product/db.product-margarine-0.1.csv"
+						primaryKey="id"
+						quotchar='"' separator=","
+						tableName="product">
+		</loadUpdateData>
+	</changeSet>
+
+	<changeSet author="roy" id="insert-product-susu-0.1" runOnChange="true">
+		<loadUpdateData encoding="UTF-8" file="liquibase/data/product/db.product-susu-0.1.csv"
+						primaryKey="id"
+						quotchar='"' separator=","
+						tableName="product">
+		</loadUpdateData>
+	</changeSet>
 </databaseChangeLog>
